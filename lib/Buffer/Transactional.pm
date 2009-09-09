@@ -8,11 +8,9 @@ use Buffer::Transactional::StringBuffer;
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
-class_type 'IO::Handle';
-
 has 'out' => (
     is       => 'ro',
-    isa      => 'IO::Handle',
+    isa      => duck_type( [ 'print' ] ),
     required => 1,
 );
 

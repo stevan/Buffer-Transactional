@@ -5,8 +5,14 @@ our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
 requires 'put';
-requires 'subsume';
 requires 'as_string';
+
+sub subsume {
+    my ($self, $buffer) = @_;
+    (blessed $buffer && $buffer->does('Buffer::Transactional::Buffer'))
+        || confess "You can only subsume other buffers";
+    $self->put( $buffer->as_string );
+}
 
 no Moose::Role; 1;
 
