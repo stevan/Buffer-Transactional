@@ -2,30 +2,26 @@ package Buffer::Transactional::StringBuffer;
 use Moose;
 use Moose::Util::TypeConstraints;
 
-use IO::String;
-
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
-
-class_type 'IO::String';
 
 with 'Buffer::Transactional::Buffer';
 
 has '_buffer' => (
-    is      => 'ro',
-    isa     => 'IO::String',
+    is      => 'rw',
+    isa     => 'Str',
     lazy    => 1,
-    default => sub { IO::String->new },
+    default => sub { '' },
 );
 
 sub put {
     my $self = shift;
-    $self->_buffer->print( @_ );
+    $self->_buffer( join "" => $self->_buffer, @_ );
 }
 
 sub as_string {
     my $self = shift;
-    ${ $self->_buffer->string_ref }
+    $self->_buffer
 }
 
 __PACKAGE__->meta->make_immutable;
