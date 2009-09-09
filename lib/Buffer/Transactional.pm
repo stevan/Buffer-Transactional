@@ -3,14 +3,14 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::AttributeHelpers;
 
-use IO::String;
+use Buffer::Transactional::StringBuffer;
 
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
 class_type 'IO::Handle';
 
-has 'output' => (
+has 'out' => (
     is       => 'ro',
     isa      => 'IO::Handle',
     required => 1,
@@ -19,22 +19,29 @@ has 'output' => (
 has '_buffers' => (
     metaclass => 'Collection::Array',
     is        => 'ro',
-    isa       => 'ArrayRef[ IO::String ]',
+    isa       => 'ArrayRef[ Buffer::Transactional::Buffer ]',
     lazy      => 1,
     default   => sub { [] },
     provides  => {
         'pop'   => 'clear_current_buffer',
         'empty' => 'has_current_buffer',
-        'push'  => '_add_to_buffers',
+        'push'  => '_add_buffer',
     },
     curries   => {
         'get'  => { 'current_buffer' => [ -1 ] },
     }
 );
 
+has 'buffer_class' => (
+    is      => 'ro',
+    isa     => 'ClassName',
+    lazy    => 1,
+    default => sub { 'Buffer::Transactional::StringBuffer' },
+);
+
 sub begin_work {
     my $self = shift;
-    $self->_add_to_buffers( IO::String->new );
+    $self->_add_buffer( $self->buffer_class->new );
 }
 
 sub commit {
@@ -45,10 +52,10 @@ sub commit {
     my $current = $self->clear_current_buffer;
 
     if ($self->has_current_buffer) {
-        $self->current_buffer->print( ${ $current->string_ref });
+        $self->current_buffer->subsume( $current );
     }
     else {
-        $self->output->print( ${ $current->string_ref } );
+        $self->out->print( $current->as_string );
     }
 }
 
@@ -63,7 +70,7 @@ sub _write_to_buffer {
     my $self = shift;
     ($self->has_current_buffer)
         || confess "Not within transaction scope";
-    $self->current_buffer->print( @_ );
+    $self->current_buffer->put( @_ );
 }
 
 sub print {
@@ -98,7 +105,7 @@ Buffer::Transactional - A Moosey solution to this problem
   use Try::Tiny;
   use Buffer::Transactional;
 
-  my $b = Buffer::Transactional->new( output => IO::File->new(">", "foo.txt") );
+  my $b = Buffer::Transactional->new( out => IO::File->new(">", "foo.txt") );
   try {
       $b->print('OH HAI');
       $b->print('KTHNXBYE');
