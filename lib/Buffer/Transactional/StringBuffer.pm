@@ -23,13 +23,6 @@ sub put {
     $self->_buffer->print( @_ );
 }
 
-sub subsume {
-    my ($self, $buffer) = @_;
-    (blessed $buffer && $buffer->isa( __PACKAGE__ ))
-        || confess "You can only subsume other buffers";
-    $self->put( $buffer->as_string );
-}
-
 sub as_string {
     my $self = shift;
     ${ $self->_buffer->string_ref }
