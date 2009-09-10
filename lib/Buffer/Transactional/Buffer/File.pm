@@ -1,27 +1,48 @@
-package Buffer::Transactional::StringBuffer;
+package Buffer::Transactional::Buffer::File;
 use Moose;
 use Moose::Util::TypeConstraints;
+
+use IO::File;
+use Data::UUID;
 
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
+class_type 'IO::File';
+
 with 'Buffer::Transactional::Buffer';
 
-has '_buffer' => (
-    is      => 'rw',
+has 'uuid' => (
+    is      => 'ro',
     isa     => 'Str',
     lazy    => 1,
-    default => sub { '' },
+    default => sub { Data::UUID->new->create_str },
+);
+
+has '_buffer' => (
+    is      => 'ro',
+    isa     => 'IO::File',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        IO::File->new( $self->uuid, 'w' )
+    },
 );
 
 sub put {
     my $self = shift;
-    $self->_buffer( join "" => $self->_buffer, @_ );
+    $self->_buffer->print( @_ );
 }
 
 sub as_string {
     my $self = shift;
-    $self->_buffer
+    $self->_buffer->flush;
+    join "" => IO::File->new( $self->uuid, 'r' )->getlines;
+}
+
+sub DEMOLISH {
+    my $self = shift;
+    unlink $self->uuid;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -34,11 +55,11 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional::StringBuffer - A Moosey solution to this problem
+Buffer::Transactional::Buffer::File - A Moosey solution to this problem
 
 =head1 SYNOPSIS
 
-  use Buffer::Transactional::StringBuffer;
+  use Buffer::Transactional::Buffer::File;
 
 =head1 DESCRIPTION
 

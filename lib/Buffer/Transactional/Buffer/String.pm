@@ -1,18 +1,31 @@
-package Buffer::Transactional::Buffer;
-use Moose::Role;
+package Buffer::Transactional::Buffer::String;
+use Moose;
 
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
-requires 'put';
-requires 'as_string';
+with 'Buffer::Transactional::Buffer';
 
-sub subsume {
-    my ($self, $buffer) = @_;
-    $self->put( $buffer->as_string );
+has '_buffer' => (
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub { '' },
+);
+
+sub put {
+    my $self = shift;
+    $self->_buffer( join "" => $self->_buffer, @_ );
 }
 
-no Moose::Role; 1;
+sub as_string {
+    my $self = shift;
+    $self->_buffer
+}
+
+__PACKAGE__->meta->make_immutable;
+
+no Moose; 1;
 
 __END__
 
@@ -20,11 +33,11 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional::Buffer - A Moosey solution to this problem
+Buffer::Transactional::Buffer::String - A Moosey solution to this problem
 
 =head1 SYNOPSIS
 
-  use Buffer::Transactional::Buffer;
+  use Buffer::Transactional::Buffer::String;
 
 =head1 DESCRIPTION
 

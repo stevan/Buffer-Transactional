@@ -3,7 +3,7 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::AttributeHelpers;
 
-use Buffer::Transactional::StringBuffer;
+use Buffer::Transactional::Buffer::String;
 
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
@@ -34,7 +34,7 @@ has 'buffer_class' => (
     is      => 'ro',
     isa     => 'ClassName',
     lazy    => 1,
-    default => sub { 'Buffer::Transactional::StringBuffer' },
+    default => sub { 'Buffer::Transactional::Buffer::String' },
 );
 
 sub begin_work {
@@ -74,16 +74,6 @@ sub _write_to_buffer {
 sub print {
     my ($self, @data) = @_;
     $self->_write_to_buffer( @data );
-}
-
-sub printf {
-    my ($self, $format, @data) = @_;
-    $self->_write_to_buffer( sprintf $format, @data );
-}
-
-sub say {
-    my ($self, @data) = @_;
-    $self->_write_to_buffer( map { "$_\n" } @data );
 }
 
 __PACKAGE__->meta->make_immutable;

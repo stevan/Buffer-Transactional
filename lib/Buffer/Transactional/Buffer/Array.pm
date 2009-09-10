@@ -1,48 +1,31 @@
-package Buffer::Transactional::FileBuffer;
+package Buffer::Transactional::Buffer::Array;
 use Moose;
-use Moose::Util::TypeConstraints;
-
-use IO::File;
-use Data::UUID;
 
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
-class_type 'IO::File';
-
 with 'Buffer::Transactional::Buffer';
 
-has 'uuid' => (
-    is      => 'ro',
-    isa     => 'Str',
-    lazy    => 1,
-    default => sub { Data::UUID->new->create_str },
-);
-
 has '_buffer' => (
-    is      => 'ro',
-    isa     => 'IO::File',
+    is      => 'rw',
+    isa     => 'ArrayRef',
     lazy    => 1,
-    default => sub {
-        my $self = shift;
-        IO::File->new( $self->uuid, 'w' )
-    },
+    default => sub { [] },
 );
 
 sub put {
     my $self = shift;
-    $self->_buffer->print( @_ );
+    push @{ $self->_buffer } => @_;
+}
+
+sub subsume {
+    my ($self, $buffer) = @_;
+    $self->put( @{ $buffer->_buffer } );
 }
 
 sub as_string {
     my $self = shift;
-    $self->_buffer->flush;
-    join "" => IO::File->new( $self->uuid, 'r' )->getlines;
-}
-
-sub DEMOLISH {
-    my $self = shift;
-    unlink $self->uuid;
+    join "" => @{ $self->_buffer }
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -55,11 +38,11 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional::FileBuffer - A Moosey solution to this problem
+Buffer::Transactional::Buffer::Array - A Moosey solution to this problem
 
 =head1 SYNOPSIS
 
-  use Buffer::Transactional::FileBuffer;
+  use Buffer::Transactional::Buffer::Array;
 
 =head1 DESCRIPTION
 
