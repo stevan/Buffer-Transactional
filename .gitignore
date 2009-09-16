@@ -1,0 +1,7 @@
+.*
+!.gitignore
+blib
+inc
+pm_to_blib
+Debian*
+\.DS_Store
