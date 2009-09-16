@@ -33,21 +33,7 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional::Buffer::String - A Moosey solution to this problem
-
-=head1 SYNOPSIS
-
-  use Buffer::Transactional::Buffer::String;
-
-=head1 DESCRIPTION
-
-=head1 METHODS
-
-=over 4
-
-=item B<>
-
-=back
+Buffer::Transactional::Buffer::String - A simple string buffer
 
 =head1 BUGS
 

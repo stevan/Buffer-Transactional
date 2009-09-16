@@ -38,21 +38,7 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional::Buffer::Array - A Moosey solution to this problem
-
-=head1 SYNOPSIS
-
-  use Buffer::Transactional::Buffer::Array;
-
-=head1 DESCRIPTION
-
-=head1 METHODS
-
-=over 4
-
-=item B<>
-
-=back
+Buffer::Transactional::Buffer::Array - An arrayref based buffer
 
 =head1 BUGS
 

@@ -20,19 +20,33 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional::Buffer - A Moosey solution to this problem
-
-=head1 SYNOPSIS
-
-  use Buffer::Transactional::Buffer;
+Buffer::Transactional::Buffer - A role to represent a buffer
 
 =head1 DESCRIPTION
+
+This is a role to represent our buffer types.
 
 =head1 METHODS
 
 =over 4
 
-=item B<>
+=item B<put ( @items )>
+
+This method is required, it is used to add elements to
+the buffer.
+
+=item B<as_string>
+
+This method is required, it is used to collapse a buffer
+into a string.
+
+=item B<subsume ( $buffer )>
+
+This method has a minimal implementation which simply puts
+the results of calling C<to_string> on the C<$buffer> arg
+into the local buffer. Feel free to override this if it is
+not appropriate, see L<Buffer::Transactional::Buffer::Lazy>
+for an example of this.
 
 =back
 

@@ -86,7 +86,7 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional - A Moosey solution to this problem
+Buffer::Transactional - A transactional buffer for writing data
 
 =head1 SYNOPSIS
 
@@ -95,24 +95,84 @@ Buffer::Transactional - A Moosey solution to this problem
 
   my $b = Buffer::Transactional->new( out => IO::File->new(">", "foo.txt") );
   try {
-      $b->print('OH HAI');
-      $b->print('KTHNXBYE');
-      die "Whoops!\n"
+      $b->begin_work;
+      $b->print('It was the best of times, it was the worst of times ...');
+      # ...
+      die "Whoops!"
+      # ...
+      $b->commit;
   } catch {
       $b->rollback;
+      warn "Transaction aborted because : $_";
   };
 
-  $b->commit;
 
 =head1 DESCRIPTION
+
+Allow me to take you on a journey, into the distant past ...
+
+So a year or so ago I got really into the O'Caml language and in exploring
+the available libraries I stumbled onto OCamlnet. Ocamlnet is basically an
+all things internet related module for O'Caml. Of particular interest to me
+was their CGI module and one nice feature jumped out at me, which was the
+fact they used a transactional buffer to print the output of the CGI. Now,
+in a Modern Perl world few people probably call C<print> inside a CGI script
+anymore, but instead use templating systems and the like. However I still
+thought that a nice transactional buffer would be useful for other things
+such as in the internals of such a templating system or the bowels of a web
+framework.
+
+Fast forward to 2009 ... and here you have it! We support several different
+kind of buffer types as well as nested transactions. As this is the first
+release, no doubt there is much room for improvement so feel free to suggest
+away.
+
+Use only as directed, be sure to check with your doctor to make sure
+your healthy enough for transactional activity. If your transaction lasts
+for more then 4 hours, consult a physician immediately.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item B<out>
+
+This is an object which responds to the method C<print>, most often
+it will be some kind of L<IO::File>, L<IO::String> or L<IO::Scalar>
+varient. This attribute is required.
+
+=item B<buffer_class>
+
+This is a class name for the buffer subclass you wish to use, it
+currently defaults to L<Buffer::Transactional::Buffer::String>.
+
+=back
 
 =head1 METHODS
 
 =over 4
 
-=item B<>
+=item B<begin_work>
+
+Declares the start of a transaction.
+
+=item B<commit>
+
+Commits the current transaction.
+
+=item B<rollback>
+
+Rollsback the current transaction.
+
+=item B<print ( @strings )>
+
+Print to the current buffer.
 
 =back
+
+=head1 SEE ALSO
+
+OCamlnet - L<http://projects.camlcity.org/projects/ocamlnet.html>
 
 =head1 BUGS
 

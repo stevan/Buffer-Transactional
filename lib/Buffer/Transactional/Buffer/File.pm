@@ -55,21 +55,12 @@ __END__
 
 =head1 NAME
 
-Buffer::Transactional::Buffer::File - A Moosey solution to this problem
-
-=head1 SYNOPSIS
-
-  use Buffer::Transactional::Buffer::File;
+Buffer::Transactional::Buffer::File - A file based buffer
 
 =head1 DESCRIPTION
 
-=head1 METHODS
-
-=over 4
-
-=item B<>
-
-=back
+This buffer will write a file for each buffer it creates and
+name it with a UUID. Upon destruction it will cleanup the file.
 
 =head1 BUGS
 
