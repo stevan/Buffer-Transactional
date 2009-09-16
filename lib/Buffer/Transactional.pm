@@ -90,22 +90,22 @@ Buffer::Transactional - A transactional buffer for writing data
 
 =head1 SYNOPSIS
 
+  use IO::File;
   use Try::Tiny;
   use Buffer::Transactional;
 
-  my $b = Buffer::Transactional->new( out => IO::File->new(">", "foo.txt") );
+  my $b = Buffer::Transactional->new( out => IO::File->new('my_novel.txt', 'w') );
   try {
       $b->begin_work;
       $b->print('It was the best of times, it was the worst of times ...');
       # ...
-      die "Whoops!"
+      die "Whoops!";
       # ...
       $b->commit;
   } catch {
       $b->rollback;
       warn "Transaction aborted because : $_";
   };
-
 
 =head1 DESCRIPTION
 
