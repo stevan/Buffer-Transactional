@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use inc::Module::Install;
 
-name 'Buffer::Transactional';
+name 'Buffer-Transactional';
 all_from 'lib/Buffer/Transactional.pm';
 
 requires 'Moose'                      => 0;
