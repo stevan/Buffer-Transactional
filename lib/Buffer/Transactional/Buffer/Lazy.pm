@@ -1,37 +1,31 @@
 package Buffer::Transactional::Buffer::Lazy;
 use Moose;
-use MooseX::AttributeHelpers;
-use Moose::Util::TypeConstraints;
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
-with 'Buffer::Transactional::Buffer';
-
 has '_buffer' => (
-    metaclass => 'Collection::Array',
-    is        => 'rw',
-    isa       => 'ArrayRef[CodeRef]',
-    lazy      => 1,
-    default   => sub { [] },
-    provides  => {
-        'push' => '_add_to_buffer',
+    traits  => [ 'Array' ],
+    is      => 'rw',
+    isa     => 'ArrayRef[CodeRef]',
+    lazy    => 1,
+    default => sub { [] },
+    handles => {
+        'put'      => 'push',
+        '_flatten' => [ 'map' => sub { $_->() } ],
     }
 );
 
-sub put {
-    my $self = shift;
-    $self->_add_to_buffer( @_ );
-}
+# *sigh* Moose
+with 'Buffer::Transactional::Buffer';
 
 sub subsume {
     my ($self, $buffer) = @_;
-    $self->put(sub { map { $_->() } @{ $buffer->_buffer } });
+    $self->put( sub { $buffer->_flatten } );
 }
 
 sub as_string {
-    my $self = shift;
-    join "" => map { $_->() } @{ $self->_buffer }
+    join "" => (shift)->_flatten
 }
 
 __PACKAGE__->meta->make_immutable;

@@ -1,31 +1,28 @@
 package Buffer::Transactional::Buffer::Array;
 use Moose;
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
-with 'Buffer::Transactional::Buffer';
-
 has '_buffer' => (
-    is      => 'rw',
+    traits  => [ 'Array' ],
+    is      => 'ro',
     isa     => 'ArrayRef',
     lazy    => 1,
     default => sub { [] },
+    handles => {
+        'put'       => 'push',
+        'as_string' => [ 'join', '' ],
+        '_flatten'  => 'elements',
+    }
 );
 
-sub put {
-    my $self = shift;
-    push @{ $self->_buffer } => @_;
-}
+# *sigh* Moose
+with 'Buffer::Transactional::Buffer';
 
 sub subsume {
     my ($self, $buffer) = @_;
-    $self->put( @{ $buffer->_buffer } );
-}
-
-sub as_string {
-    my $self = shift;
-    join "" => @{ $self->_buffer }
+    $self->put( $buffer->_flatten );
 }
 
 __PACKAGE__->meta->make_immutable;

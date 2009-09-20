@@ -5,12 +5,10 @@ use Moose::Util::TypeConstraints;
 use IO::File;
 use Data::UUID;
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
 class_type 'IO::File';
-
-with 'Buffer::Transactional::Buffer';
 
 has 'uuid' => (
     is      => 'ro',
@@ -23,16 +21,14 @@ has '_buffer' => (
     is      => 'ro',
     isa     => 'IO::File',
     lazy    => 1,
-    default => sub {
-        my $self = shift;
-        IO::File->new( $self->uuid, 'w' )
-    },
+    default => sub { IO::File->new( (shift)->uuid, 'w' ) },
+    handles => {
+        'put' => 'print'
+    }
 );
 
-sub put {
-    my $self = shift;
-    $self->_buffer->print( @_ );
-}
+# *sigh* Moose
+with 'Buffer::Transactional::Buffer';
 
 sub as_string {
     my $self = shift;

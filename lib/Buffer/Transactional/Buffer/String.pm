@@ -1,27 +1,25 @@
 package Buffer::Transactional::Buffer::String;
 use Moose;
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
-with 'Buffer::Transactional::Buffer';
-
 has '_buffer' => (
-    is      => 'rw',
+    traits  => [ 'String' ],
+    reader  => 'as_string',
+    writer  => '_buffer',
     isa     => 'Str',
     lazy    => 1,
     default => sub { '' },
+    handles => {
+        '_add_to_buffer' => 'append'
+    }
 );
 
-sub put {
-    my $self = shift;
-    $self->_buffer( join "" => $self->_buffer, @_ );
-}
+# *sigh* Moose
+with 'Buffer::Transactional::Buffer';
 
-sub as_string {
-    my $self = shift;
-    $self->_buffer
-}
+sub put { (shift)->_add_to_buffer( join "" => @_ ) }
 
 __PACKAGE__->meta->make_immutable;
 

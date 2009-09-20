@@ -1,4 +1,4 @@
-Buffer::Transactional version 0.01
+Buffer::Transactional version 0.02
 ===========================
 
 See the individual module documentation for more information
@@ -17,7 +17,6 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
     Moose
-    MooseX::AttributeHelpers
     IO::File
     Data::UUID
 

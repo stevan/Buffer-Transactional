@@ -1,11 +1,10 @@
 package Buffer::Transactional;
 use Moose;
 use Moose::Util::TypeConstraints;
-use MooseX::AttributeHelpers;
 
 use Buffer::Transactional::Buffer::String;
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
 has 'out' => (
@@ -15,18 +14,16 @@ has 'out' => (
 );
 
 has '_buffers' => (
-    metaclass => 'Collection::Array',
-    is        => 'ro',
-    isa       => 'ArrayRef[ Buffer::Transactional::Buffer ]',
-    lazy      => 1,
-    default   => sub { [] },
-    provides  => {
-        'pop'   => 'clear_current_buffer',
-        'empty' => 'has_current_buffer',
-        'push'  => '_add_buffer',
-    },
-    curries   => {
-        'get'  => { 'current_buffer' => [ -1 ] },
+    traits  => [ 'Array' ],
+    is      => 'ro',
+    isa     => 'ArrayRef[ Buffer::Transactional::Buffer ]',
+    lazy    => 1,
+    default => sub { [] },
+    handles => {
+        '_add_buffer'          => 'push',
+        'clear_current_buffer' => 'pop',
+        'has_current_buffer'   => 'count',
+        'current_buffer'       => [ 'get', -1 ]
     }
 );
 
