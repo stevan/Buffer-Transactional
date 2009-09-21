@@ -73,6 +73,13 @@ sub print {
     $self->_write_to_buffer( @data );
 }
 
+sub txn_do {
+    my ($self, $body) = @_;
+    $self->begin_work;
+    $body->();
+    $self->commit;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 no Moose; 1;
@@ -164,6 +171,13 @@ Rollsback the current transaction.
 =item B<print ( @strings )>
 
 Print to the current buffer.
+
+=item B<txn_do ( \&body )>
+
+This is a convience wrapper around the C<begin_work> and C<commit>
+methods. It takes a CODE ref and will execute it within the context
+of a transaction. It does B<not> attempt to handle exceptions,
+rollbacks or anything of the like, it simply wraps the transaction.
 
 =back
 
