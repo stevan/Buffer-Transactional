@@ -1,6 +1,6 @@
 Revision history for Perl extension Buffer::Transactional
 
-0.02
+0.02 Thurs. Jan. 7, 2010
     - Removed MooseX::AttributeHelpers dependency in
       favor of the new Moose Native Traits.
 
